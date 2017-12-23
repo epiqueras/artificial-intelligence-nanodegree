@@ -59,8 +59,20 @@ def custom_score_2(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
-    # Player moves
-    return float(len(game.get_legal_moves(player)))
+    # Player moves - opponent moves
+    player_moves = game.get_legal_moves(player)
+    player_moves_len = len(player_moves)
+    opponent_moves = game.get_legal_moves(game.get_opponent(player))
+    opponent_moves_len = len(opponent_moves)
+    score = float(player_moves_len - opponent_moves_len)
+
+    # Check for possibility of a division (simple check)
+    for p_move in player_moves:
+        for o_move in opponent_moves:
+            if p_move[0] == o_move[0] and p_move[1] == o_move[1]:  # Equal move, not divided
+                return score
+
+    return float("-inf" if opponent_moves_len > player_moves_len else "inf")
 
 
 def custom_score_3(game, player):
@@ -85,8 +97,17 @@ def custom_score_3(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
-    # - Opponent moves
-    return float(-len(game.get_legal_moves(game.get_opponent(player))))
+    # Player moves - opponent moves
+    opponent = game.get_opponent(player)
+    opponent_moves = game.get_legal_moves(opponent)
+    o_location = game.get_player_location(opponent)
+    score = float(len(game.get_legal_moves(player)) - len(opponent_moves))
+
+    # Min distance to edges
+    score -= min(game.width - o_location[0], o_location[0])
+    score -= min(game.height - o_location[1], o_location[1])
+
+    return score
 
 
 class IsolationPlayer:
