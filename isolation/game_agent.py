@@ -33,8 +33,22 @@ def custom_score(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
+    if game.is_loser(player):
+        return float("-inf")
+
+    if game.is_winner(player):
+        return float("inf")
+
     # Player moves - opponent moves
-    return float(len(game.get_legal_moves(player)) - len(game.get_legal_moves(game.get_opponent(player))))
+    p_location = game.get_player_location(player)
+    score = float(len(game.get_legal_moves(player)) -
+                  len(game.get_legal_moves(game.get_opponent(player))))
+
+    # Min distance to center
+    score -= abs(game.width / 2 - p_location[0]) / 2
+    score -= abs(game.height / 2 - p_location[1]) / 2
+
+    return score
 
 
 def custom_score_2(game, player):
@@ -59,6 +73,12 @@ def custom_score_2(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
+    if game.is_loser(player):
+        return float("-inf")
+
+    if game.is_winner(player):
+        return float("inf")
+
     # Player moves - opponent moves
     player_moves = game.get_legal_moves(player)
     player_moves_len = len(player_moves)
@@ -97,11 +117,16 @@ def custom_score_3(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
+    if game.is_loser(player):
+        return float("-inf")
+
+    if game.is_winner(player):
+        return float("inf")
+
     # Player moves - opponent moves
     opponent = game.get_opponent(player)
-    opponent_moves = game.get_legal_moves(opponent)
     o_location = game.get_player_location(opponent)
-    score = float(len(game.get_legal_moves(player)) - len(opponent_moves))
+    score = float(-len(game.get_legal_moves(opponent)))
 
     # Min distance to edges
     score -= min(game.width - o_location[0], o_location[0])
