@@ -9,3 +9,6 @@
 * Genetic Algorithms (Selection, Crossover, Mutation, Repeat)
 * Backtracking Search + Least Constraining Value + Minimum Remaining Values + Most Constraints + Forward Checking + Arc Consistency + Destructuring into Trees
 * Propositional Logic + First Order Logic + Higher Order Logic
+* Conformant, Partially Observable, Stochastic, and Classical Planning
+* Progressive and Regressive Plan Search
+* Situation Calculus
