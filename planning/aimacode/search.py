@@ -264,6 +264,7 @@ def iterative_deepening_search(problem):
 # ______________________________________________________________________________
 # Informed (Heuristic) Search
 
+
 greedy_best_first_graph_search = best_first_graph_search
 # Greedy best-first search is accomplished by specifying f(n) = h(n).
 
