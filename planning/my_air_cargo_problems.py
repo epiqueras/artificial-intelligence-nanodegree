@@ -183,15 +183,14 @@ class AirCargoProblem(Problem):
         conditions by ignoring the preconditions required for an action to be
         executed.
         """
-        problem = deepcopy(self)
-        problem.initial = node.state
-
-        for action in problem.actions_list:
-            action.precond_neg = []
-            action.precond_pos = []
-
-        result = breadth_first_search(problem)
-        return result.path_cost if result else result
+        knowledge_base = PropKB()
+        knowledge_base.tell(decode_state(
+            node.state, self.state_map).sentence())
+        min_actions = 0
+        for clause in self.goal:
+            if clause not in knowledge_base.clauses:
+                min_actions += 1
+        return min_actions
 
 
 def air_cargo_p1() -> AirCargoProblem:
