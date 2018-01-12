@@ -14,4 +14,4 @@
 * Situation Calculus
 * Bayes Nets and Probabilistic Inference with Enumeration, Variable Elimination, and Sampling + Likelihood Weighting
 * Dynamic Time Warping
-* Hidden Markov Models
+* Hidden Markov Models + Baum Welch + Stochastic Beam Search + Statistical Grammar + State Tying for training + Segmental Boosts
