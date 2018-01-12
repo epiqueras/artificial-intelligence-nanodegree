@@ -12,3 +12,6 @@
 * Conformant, Partially Observable, Stochastic, and Classical Planning
 * Progressive and Regressive Plan Search
 * Situation Calculus
+* Bayes Nets and Probabilistic Inference with Enumeration, Variable Elimination, and Sampling + Likelihood Weighting
+* Dynamic Time Warping
+* Hidden Markov Models
