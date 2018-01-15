@@ -39,11 +39,13 @@ class ModelSelector(object):
             hmm_model = GaussianHMM(n_components=num_states, covariance_type="diag", n_iter=1000,
                                     random_state=self.random_state, verbose=False).fit(self.X, self.lengths)
             if self.verbose:
-                print("model created for {} with {} states".format(self.this_word, num_states))
+                print("model created for {} with {} states".format(
+                    self.this_word, num_states))
             return hmm_model
         except:
             if self.verbose:
-                print("failure on {} with {} states".format(self.this_word, num_states))
+                print("failure on {} with {} states".format(
+                    self.this_word, num_states))
             return None
 
 
@@ -76,8 +78,21 @@ class SelectorBIC(ModelSelector):
         """
         warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-        # TODO implement model selection based on BIC scores
-        raise NotImplementedError
+        best_score = float('+inf')
+        best_n_components = self.min_n_components
+
+        for n_components in range(self.min_n_components, self.max_n_components + 1):
+            try:
+                score = (-2 * self.base_model(n_components).score(self.X, self.lengths)) + \
+                    (n_components * np.log(len(self.X[0])))
+                if score < best_score:
+                    best_score = score
+                    best_n_components = n_components
+            except Exception:
+                # print("Failed to train with {} states.".format(n_components))
+                pass
+
+        return self.base_model(best_n_components)
 
 
 class SelectorDIC(ModelSelector):
@@ -93,8 +108,25 @@ class SelectorDIC(ModelSelector):
     def select(self):
         warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-        # TODO implement model selection based on DIC scores
-        raise NotImplementedError
+        other_words = [word for word in self.words if word != self.this_word]
+        best_score = float('-inf')
+        best_n_components = self.min_n_components
+
+        for n_components in range(self.min_n_components, self.max_n_components + 1):
+            try:
+                model = self.base_model(n_components)
+                other_scores = [model.score(
+                    self.hwords[word][0], self.hwords[word][1]) for word in other_words]
+                score = model.score(self.X, self.lengths) - \
+                    np.mean(other_scores)
+                if score > best_score:
+                    best_score = score
+                    best_n_components = n_components
+            except Exception:
+                # print("Failed to train with {} states.".format(n_components))
+                pass
+
+        return self.base_model(best_n_components)
 
 
 class SelectorCV(ModelSelector):
@@ -105,5 +137,33 @@ class SelectorCV(ModelSelector):
     def select(self):
         warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-        # TODO implement model selection using CV
-        raise NotImplementedError
+        n_sequences = len(self.sequences)
+        if n_sequences < 2:
+            return None
+
+        split_method = KFold(n_sequences)
+        best_score = float('-inf')
+        best_n_components = self.min_n_components
+
+        for n_components in range(self.min_n_components, self.max_n_components + 1):
+            avg_score = []
+            for training_idxs, testing_idxs in split_method.split(self.sequences):
+                try:
+                    self.X, self.lengths = combine_sequences(
+                        training_idxs, self.sequences)
+                    test_x, test_lengths = combine_sequences(
+                        testing_idxs, self.sequences)
+                    avg_score.append(self.base_model(
+                        n_components).score(test_x, test_lengths))
+                except Exception:
+                    # print("Failed a training set with {} states.".format(
+                    #     n_components))
+                    pass
+            if avg_score:
+                avg_score = np.mean(avg_score)
+                if avg_score > best_score:
+                    best_score = avg_score
+                    best_n_components = n_components
+
+        self.X, self.lengths = self.hwords[self.this_word]
+        return self.base_model(best_n_components)
